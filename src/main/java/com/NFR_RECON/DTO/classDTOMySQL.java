@@ -1,16 +1,11 @@
-package com.NFR_RECON.Entity;
+package com.NFR_RECON.DTO;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import java.sql.Date;
 
 @Data
-@Entity
-@Table(name = "gstr2b_regular_recon_upload")
-public class classForMySql {
+public class classDTOMySQL {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private double adTax;
     private double camt;
