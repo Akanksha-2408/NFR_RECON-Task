@@ -7,7 +7,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 
 @Data
-public class classDTOMongo {
+public class classDtoMongo {
 
     private ObjectId id;
     private Long usrId;

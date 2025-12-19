@@ -4,7 +4,7 @@ import lombok.Data;
 import java.sql.Date;
 
 @Data
-public class classDTOMySQL {
+public class classDtoMysql {
 
     private Long id;
     private double adTax;
