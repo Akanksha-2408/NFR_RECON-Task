@@ -1,17 +1,22 @@
-package com.NFR_RECON.DTO;
+package com.NFR_RECON.Entity;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
-import org.bson.BsonInt32;
 import org.bson.types.ObjectId;
-import java.sql.Date;
+import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.Date;
 import java.util.ArrayList;
 
+@Document(collection = "GSTR_INVOICE_DETAILS_INWARD")
 @Data
-public class classDtoMongo {
-
+public class Entity_Mongo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private ObjectId id;
     private Long usrId;
-    private BsonInt32 gstinId;
+    private Integer gstinId;
     private String gstin;
     private String retPeriod;
     private String retType;
@@ -25,6 +30,7 @@ public class classDtoMongo {
     private ArrayList<String> headerKeys;
 
     // --- Invoice level fields ---
+
     private String extDocType;
     private Date invDate;
     private int pos;
@@ -41,6 +47,7 @@ public class classDtoMongo {
     private boolean multiValue;
 
     // --- V2.0 fields ---
+
     private String doctyp;
     private String ctin;
     private String subTxnId;
@@ -64,5 +71,16 @@ public class classDtoMongo {
     private String custom6;
     private String custom7;
     private String invType;
-
 }
+
+//class DocumentDate {
+//    private Date $date;
+//
+//    public Date get$date() {
+//        return $date;
+//    }
+//
+//    public void set$date(Date $date) {
+//        this.$date = $date;
+//    }
+//}

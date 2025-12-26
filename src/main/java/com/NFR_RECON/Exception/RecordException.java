@@ -1,4 +1,4 @@
-package com.NFR_RECON.ErrorCode;
+package com.NFR_RECON.Exception;
 
 import lombok.Data;
 

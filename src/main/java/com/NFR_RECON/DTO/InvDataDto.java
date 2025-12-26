@@ -1,7 +1,6 @@
 package com.NFR_RECON.DTO;
 
 import lombok.Data;
-import java.util.List;
 import java.util.Set;
 
 @Data
