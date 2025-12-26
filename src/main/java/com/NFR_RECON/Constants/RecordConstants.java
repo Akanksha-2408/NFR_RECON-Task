@@ -16,6 +16,7 @@ public enum RecordConstants {
             "different number of records having "),
     NO_MISSING_OR_DUPLICATE_RECORD_FOUND("No missing or duplicate records found with "),
     FAILED_TO_FETCH_MISSING_DATA_FROM_MYSQL_DB("Failed to fetch missing data records in MySql database with "),
+    FAILED_TO_FETCH_MISSING_DATA_FROM_MONGO_DB("Failed to fetch missing data records in Mongo database with "),
     FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MYSQL_DB("Failed to fetch duplicate data records from Mysql database with "),
     FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MONGO_DB("Failed to fetch duplicate data records from Mongo database with "),;
 

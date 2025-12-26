@@ -8,14 +8,13 @@ import com.NFR_RECON.Exception.ErrorCode;
 import com.NFR_RECON.Exception.RecordException;
 import com.NFR_RECON.Repository.MongoDataRepo;
 import com.NFR_RECON.Repository.MysqlDataRepo;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static com.NFR_RECON.Constants.RecordConstants.*;
 
-
-@Log4j2
 @Service
 public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissingService {
 
@@ -25,6 +24,8 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
 
     @Autowired
     MongoDataRepo mongo_repo;
+
+    public static final Logger LOGGER = Logger.getLogger(FindDuplicateAndMissingServiceImpl.class.getName());
 
 
     /**
@@ -36,11 +37,11 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
      * @param txnidList List<String> txnidList registered under specific gstin
      * @return Map<String, Object> where Object consists of all the duplicate and missing data fields
      */
-//   TODO : Add start and end loggers in required format.
+
     @Override
     public Map<String, Object> findDuplicateAndMissingData(String gstin, List<String> txnidList) {
 
-        log.info("START : CLASS >> FindDuplicateAndMissingDataServiceImpl >> METHOD >> findDuplicateAndMissingData");
+        LOGGER.log(Level.INFO, "START : CLASS >> FindDuplicateAndMissingDataServiceImpl >> METHOD >> findDuplicateAndMissingData");
 
         Map<String, Object> invMap = new HashMap<>();
         InvDataDto invDataDto = new InvDataDto();
@@ -52,7 +53,6 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
         for(String txnId : txnidList) {
             mysql_data = mysql_repo.getAll(gstin, txnId);
 
-//            TODO: Fetch the data whose status is migrated.
             List<Entity_Mongo> mongoData = mongo_repo.findByGstinAndTxnIdIn(gstin, txnId);
             for(Entity_Mongo data_mongo : mongoData) {
                 if(data_mongo.getMigrationStatus().equalsIgnoreCase(MIGRATION_STATUS.getValue())) {
@@ -60,9 +60,8 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                 }
             }
 
-            log.info("INTERMEDIATE : CLASS >> FindDuplicateAndMissingService >> METHOD >> findDuplicateAndMissingData -> " + FETCH_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
+            LOGGER.log(Level.INFO, "INTERMEDIATE : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> " + FETCH_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
 
-//            TODO: Use constants.
             if (mongo_data.isEmpty() && mysql_data.isEmpty()) {
                 invMap.put(DATA.getValue(), NO_RECORDS_FOUND.getValue() + gstin + " and txnId = " + txnId);
 
@@ -75,9 +74,22 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                         invDataDto.setMissingInMysql(mysql_missing_data);
                     }
                 } catch (RecordException e) {
-                    log.error("ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> "
+                    LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> "
                             + FAILED_TO_FETCH_MISSING_DATA_FROM_MYSQL_DB.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
                     invMap.put(DATA.getValue(), FAILED_TO_FETCH_MISSING_DATA_FROM_MYSQL_DB.getValue() + " gstin = " + gstin + " and txnId = " + txnId);
+                }
+
+
+                try {
+                    // --- Finding missing data in mongo db ---
+                    Set<InvDetailDataDto> mongo_missing_data = getMissingData_mongo(mongo_data, mysql_data, invDataDto, txnId);
+                    if(!mongo_missing_data.isEmpty()) {
+                        invDataDto.setMissingInMongo(mongo_missing_data);
+                    }
+                } catch (RecordException e) {
+                    LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> "
+                            + FAILED_TO_FETCH_MISSING_DATA_FROM_MONGO_DB.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
+                    invMap.put(DATA.getValue(), FAILED_TO_FETCH_MISSING_DATA_FROM_MONGO_DB.getValue() + " gstin = " + gstin + " and txnId = " + txnId);
                 }
 
 
@@ -86,7 +98,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                     Set<InvDetailDataDto> mysql_duplicate_data = getDuplicateData_mysql(mysql_data, gstin, txnId, invDataDto);
                     invDataDto.setDuplicateInMysql(mysql_duplicate_data);
                 } catch (RecordException e) {
-                    log.error("ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> " + FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MYSQL_DB.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
+                    LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> " + FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MYSQL_DB.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
                     invMap.put(DATA.getValue(), FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MYSQL_DB.getValue() + " gstin = " + gstin + " and txnId = " + txnId);
                 }
 
@@ -96,12 +108,12 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                     Set<InvDetailDataDto> mongo_duplicate_data = getDuplicateData_mongo(mongo_data, gstin, txnId, invDataDto);
                     invDataDto.setDuplicateInMongo(mongo_duplicate_data);
                 } catch (RecordException e) {
-                    log.error("ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> " + FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MONGO_DB.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
+                    LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> " + FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MONGO_DB.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
                     invMap.put(DATA.getValue(), FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MONGO_DB.getValue() + " gstin = " + gstin + " and txnId = " + txnId);
                 }
 
                 invMap.put(DATA.getValue(), invDataDto);
-                log.info("END : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> " + ADD_ALL_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
+                LOGGER.log(Level.INFO, "END : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> findDuplicateAndMissingData -> " + ADD_ALL_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnId);
             }
         }
         return invMap;
@@ -121,14 +133,14 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
     public Set<InvDetailDataDto> getDuplicateData_mysql(List<Entity_Mysql> mysql_data, String gstin, String txnid,
                                                         InvDataDto invDataDto) {
 
-        log.info("START : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> getDuplicateData_mysql");
+        LOGGER.log(Level.INFO, "START : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> getDuplicateData_mysql");
 
         Set<String> uniqueInvKeys_mysql = new HashSet<>();
         Set<InvDetailDataDto> duplicateData_mysql = new HashSet<>();
 
         try {
             for (Entity_Mysql record : mysql_data) {
-                String invKey = record.getCtin() + record.getInum();
+                String invKey = record.getCtin() + "#" + record.getInum();
                 if (!uniqueInvKeys_mysql.add(invKey)) {
                     InvDetailDataDto duplicates_mysql = new InvDetailDataDto();
                     duplicates_mysql.setDocType(record.getTyp());
@@ -139,10 +151,10 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                     duplicateData_mysql.add(duplicates_mysql);
                 }
             }
-            log.info("END : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> getDuplicateData_mysql -> " + FETCH_DUPLICATE_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
+            LOGGER.log(Level.INFO, "END : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> getDuplicateData_mysql -> " + FETCH_DUPLICATE_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
 
         } catch (RecordException re) {
-            log.error("ERROR : FindDuplicateAndMissingServiceImpl >> METHOD >> getDuplicateData_mysql -> " + FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST);
+            LOGGER.log(Level.SEVERE, "findDuplicateAndMissingServiceImpl :: getDuplicateData_mysql :: Failed to get duplicate and missing data from mysql database");
             throw new RecordException(ErrorCode.FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST);
         }
         return duplicateData_mysql;
@@ -162,7 +174,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
     public Set<InvDetailDataDto> getDuplicateData_mongo(List<Entity_Mongo> mongo_data, String gstin, String txnid,
                                                         InvDataDto invDataDto) {
 
-        log.info("START : CLASS >> FindDuplicateAndMissingServiceImpl >> getDuplicateData_mongo");
+        LOGGER.log(Level.INFO, "START : CLASS >> FindDuplicateAndMissingServiceImpl >> getDuplicateData_mongo");
 
         Set<String> uniqueInvKeys_mongo = new HashSet<>();
         Set<InvDetailDataDto> duplicateData_mongo = new HashSet<>();
@@ -173,7 +185,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                 if (!uniqueInvKeys_mongo.add(invKey)) {
                     InvDetailDataDto duplicates_mongo = new InvDetailDataDto();
                     duplicates_mongo.setDocType(record.getDoctyp());
-                    duplicates_mongo.setInum(record.getInvKey());
+                    duplicates_mongo.setInum(invKey.split("#")[1]);    // Changed
                     duplicates_mongo.setIdt(record.getInvDate());
                     duplicates_mongo.setCtin(record.getCtin());
                     duplicates_mongo.setTxnId(txnid);
@@ -181,10 +193,10 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                 }
             }
 
-            log.info("END : CLASS >> FindDuplicateAndMissingServiceImpl >> getDuplicateData_mongo -> " + FETCH_DUPLICATE_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
+            LOGGER.log(Level.INFO, "END : CLASS >> FindDuplicateAndMissingServiceImpl >> getDuplicateData_mongo -> " + FETCH_DUPLICATE_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
 
         } catch (RecordException re) {
-            log.error("ERROR : FindDuplicateAndMissingServiceImpl >> METHOD >> getDuplicateData_mongo -> " + FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST);
+            LOGGER.log(Level.SEVERE, "ERROR : FindDuplicateAndMissingServiceImpl >> METHOD >> getDuplicateData_mongo -> " + FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST);
             throw new RecordException(ErrorCode.FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST);
         }
         return duplicateData_mongo;
@@ -199,13 +211,13 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
      * @param mysql_data List of mysql records containing specific gstin, List of txnid
      * @param invDataDto InvDataDto object consisting of all required fields to be returned
      * @param txnid txnid
-     * @return List<InvDetailDataDto> mongodb records missing in mysql
+     * @return Set<InvDetailDataDto> mongodb records missing in mysql
      */
     @Override
     public Set<InvDetailDataDto> getMissingData_mysql(List<Entity_Mongo> mongo_data, List<Entity_Mysql> mysql_data,
                                                       InvDataDto invDataDto, String txnid) {
 
-        log.info("START : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mysql");
+        LOGGER.log(Level.INFO,"START : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mysql");
 
         Set<String> invKeyList_mysql = new HashSet<>();
         Set<InvDetailDataDto> missingData_mysql = new HashSet<>();
@@ -213,32 +225,31 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
 
         try {
             if (!mongo_data.isEmpty() && mysql_data.isEmpty()) {
-                log.info("INTERMEDIATE : FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mysql -> " +
+                LOGGER.log(Level.INFO,"INTERMEDIATE : FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mysql -> " +
                         NO_MONGO_RECORDS_FOUND.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
                 for (Entity_Mongo record : mongo_data) {
                     InvDetailDataDto missing_mysql = new InvDetailDataDto();
                     missing_mysql.setDocType(record.getDoctyp());
-                    missing_mysql.setInum(record.getInvKey());
+                    missing_mysql.setInum(record.getInvKey().split("#")[1]);
                     missing_mysql.setIdt(record.getInvDate());
                     missing_mysql.setCtin(record.getCtin());
                     missing_mysql.setTxnId(txnid);
                     missingData_mysql.add(missing_mysql);
                 }
 
-            } else {
-                log.info("INTERMEDIATE : FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mysql -> " +
+            } else if (!mongo_data.isEmpty() && !mysql_data.isEmpty()){
+                LOGGER.log(Level.INFO,"INTERMEDIATE : FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mysql -> " +
                         BOTH_MONGO_AND_MYSQL_RECORDS_ARE_PRESENT.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
                 for (Entity_Mysql record : mysql_data) {
-                    String invKey = record.getCtin() + record.getInum();
+                    String invKey = record.getCtin() + "#" + record.getInum();
                     invKeyList_mysql.add(invKey);
                 }
 
-//              TODO: Check the condition where size is same but the invKey is different or (non matching)
                 for (Entity_Mongo record : mongo_data) {
                     if (!invKeyList_mysql.contains(record.getInvKey())) {
                         InvDetailDataDto missing_mysql = new InvDetailDataDto();
                         missing_mysql.setDocType(record.getDoctyp());
-                        missing_mysql.setInum(record.getInvKey());
+                        missing_mysql.setInum(record.getInvKey().split("#")[1]);
                         missing_mysql.setIdt(record.getInvDate());
                         missing_mysql.setCtin(record.getCtin());
                         missing_mysql.setTxnId(txnid);
@@ -247,15 +258,82 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                 }
             }
 
-            log.info("END : CLASS >> FindDuplicateAndMissingServiceImpl >> getMissingData_mysql -> " +
+            LOGGER.log(Level.INFO,"END : CLASS >> FindDuplicateAndMissingServiceImpl >> getMissingData_mysql -> " +
                     FETCH_MISSING_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
 
         } catch(RecordException re) {
-            log.error("ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> getMissingData_mysql -> " +
+            LOGGER.log(Level.SEVERE,"ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> getMissingData_mysql -> " +
                     FAILED_TO_ADD_MISSING_RECORD_IN_LIST.getValue());
             throw new RecordException(ErrorCode.FAILED_TO_ADD_MISSING_RECORD_IN_LIST);
         }
         return missingData_mysql;
+    }
+
+    /**
+     * @author Akanksha Senad
+     * @Date 26-12-2025
+     * @Description This method returns a list of missing records present in mongo database. (In Case)
+     * @param mongo_data mongo_data
+     * @param mysql_data mysql_data
+     * @param invDataDto invDataDto
+     * @param txnid txnid
+     * @return Set<InvDetailDataDto> mysql records missing in mongo db
+     */
+    @Override
+    public Set<InvDetailDataDto> getMissingData_mongo(List<Entity_Mongo> mongo_data, List<Entity_Mysql> mysql_data,
+                                                      InvDataDto invDataDto, String txnid) {
+
+        LOGGER.log(Level.INFO,"START : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mongo");
+
+        Set<String> invKeyList_mongo = new HashSet<>();
+        Set<InvDetailDataDto> missingData_mongo = new HashSet<>();
+        String gstin = invDataDto.getGstin();
+
+        try {
+            if (mongo_data.isEmpty() && !mysql_data.isEmpty()) {
+                LOGGER.log(Level.INFO,"INTERMEDIATE : FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mongo -> " +
+                        NO_MONGO_RECORDS_FOUND.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
+                for (Entity_Mysql record : mysql_data) {
+                    InvDetailDataDto missing_mongo = new InvDetailDataDto();
+                    missing_mongo.setDocType(record.getTyp());
+                    missing_mongo.setInum(record.getInum());
+                    missing_mongo.setIdt(record.getIdt());
+                    missing_mongo.setCtin(record.getCtin());
+                    missing_mongo.setTxnId(txnid);
+                    missingData_mongo.add(missing_mongo);
+                }
+
+            } else if(!mongo_data.isEmpty() && !mysql_data.isEmpty()) {
+                LOGGER.log(Level.INFO,"INTERMEDIATE : FindDuplicateAndMissingServiceImpl >> METHOD >> getMissingData_mongo -> " +
+                        BOTH_MONGO_AND_MYSQL_RECORDS_ARE_PRESENT.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
+
+                for (Entity_Mongo record : mongo_data) {
+                    invKeyList_mongo.add(record.getInvKey());
+                }
+
+                for (Entity_Mysql record : mysql_data) {
+                    if (!invKeyList_mongo.contains(record.getCtin() + "#" + record.getInum())) {
+                        InvDetailDataDto missing_mongo = new InvDetailDataDto();
+                        missing_mongo.setDocType(record.getTyp());
+                        missing_mongo.setInum(record.getInum());
+                        missing_mongo.setIdt(record.getIdt());
+                        missing_mongo.setCtin(record.getCtin());
+                        missing_mongo.setTxnId(txnid);
+                        missingData_mongo.add(missing_mongo);
+
+                    }
+                }
+            }
+
+            LOGGER.log(Level.INFO,"END : CLASS >> FindDuplicateAndMissingServiceImpl >> getMissingData_mongo -> " +
+                    FETCH_MISSING_SUCCESS.getValue() + " gstin: " + gstin + " and TxnId: " + txnid);
+
+        } catch(RecordException re) {
+            LOGGER.log(Level.SEVERE,"ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> getMissingData_mongo -> " +
+                    FAILED_TO_ADD_MISSING_RECORD_IN_LIST.getValue());
+            throw new RecordException(ErrorCode.FAILED_TO_ADD_MISSING_RECORD_IN_LIST);
+        }
+        return missingData_mongo;
     }
 
 }

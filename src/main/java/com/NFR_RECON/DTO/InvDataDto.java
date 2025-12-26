@@ -9,4 +9,5 @@ public class InvDataDto {
     Set<InvDetailDataDto> missingInMysql;
     Set<InvDetailDataDto> duplicateInMongo;
     Set<InvDetailDataDto> duplicateInMysql;
+    Set<InvDetailDataDto> missingInMongo;
 }
