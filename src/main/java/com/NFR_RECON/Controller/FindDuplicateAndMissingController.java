@@ -23,7 +23,6 @@ public class FindDuplicateAndMissingController {
 
     public static final Logger LOGGER = Logger.getLogger(FindDuplicateAndMissingController.class.getName());
 
-
     /**
      * Returns Duplicate and Missing data map
      * @param gstin gstin
@@ -35,15 +34,18 @@ public class FindDuplicateAndMissingController {
 
         Map<String, Object> resultMap = new HashMap<>();
 
-        LOGGER.log(Level.INFO, "START : CLASS >> FindDuplicateAndMissingController >> METHOD >> getDuplicateAndMissingData");
+        LOGGER.log(Level.INFO, "START : CLASS >> FindDuplicateAndMissingController >> METHOD >> " +
+                "getDuplicateAndMissingData with GSTIN: " + gstin);
         try {
             resultMap = service.findDuplicateAndMissingData(gstin, txnIdList);
         } catch(RecordException e) {
             resultMap.put(DATA.getValue(), NO_MISSING_OR_DUPLICATE_RECORD_FOUND.getValue() + " gstin: " + gstin);
-            LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingController >> METHOD >> getDuplicateAndMissingData -> " +
-                        NO_MISSING_OR_DUPLICATE_RECORD_FOUND.getValue() + " gstin:" + gstin);
+            LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingController >> METHOD >> " +
+                    "getDuplicateAndMissingData -> " + NO_MISSING_OR_DUPLICATE_RECORD_FOUND.getValue() + " gstin:" +
+                    gstin + " >> ERROR >> " + e);
         }
-        LOGGER.log(Level.INFO, "END : CLASS >> FindDuplicateAndMissingController >> METHOD >> getDuplicateAndMissingData");
+        LOGGER.log(Level.INFO, "END : CLASS >> FindDuplicateAndMissingController >> METHOD >> " +
+                "getDuplicateAndMissingData with GSTIN: " + gstin);
         return resultMap;
 
     }
