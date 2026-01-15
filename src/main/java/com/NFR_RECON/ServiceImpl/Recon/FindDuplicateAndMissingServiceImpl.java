@@ -1,4 +1,4 @@
-package com.NFR_RECON.Service;
+package com.NFR_RECON.ServiceImpl.Recon;
 
 import com.NFR_RECON.DTO.InvDataDto;
 import com.NFR_RECON.DTO.InvDetailDataDto;
@@ -8,6 +8,7 @@ import com.NFR_RECON.Exception.ErrorCode;
 import com.NFR_RECON.Exception.RecordException;
 import com.NFR_RECON.Repository.MongoDataRepo;
 import com.NFR_RECON.Repository.MysqlDataRepo;
+import com.NFR_RECON.Service.Recon.FindDuplicateAndMissingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -80,7 +81,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                 } catch (RecordException e) {
                     LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >>" +
                             " findDuplicateAndMissingData -> " + FAILED_TO_FETCH_MISSING_DATA_FROM_MYSQL_DB.getValue() +
-                            " gstin: " + gstin + " and TxnId: " + txnId + " >> ERROR >> " + e);
+                            " gstin: " + gstin + " and TxnId: " + txnId + " >> ERROR: " + e);
                     invMap.put(DATA.getValue(), FAILED_TO_FETCH_MISSING_DATA_FROM_MYSQL_DB.getValue() + " gstin = " +
                             gstin + " and txnId = " + txnId);
                 }
@@ -96,7 +97,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                 } catch (RecordException e) {
                     LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >>" +
                             " findDuplicateAndMissingData -> " + FAILED_TO_FETCH_MISSING_DATA_FROM_MONGO_DB.getValue() +
-                            " gstin: " + gstin + " and TxnId: " + txnId +  " >> ERROR >> " + e);
+                            " gstin: " + gstin + " and TxnId: " + txnId +  " >> ERROR: " + e);
                     invMap.put(DATA.getValue(), FAILED_TO_FETCH_MISSING_DATA_FROM_MONGO_DB.getValue() + " gstin = " +
                             gstin + " and txnId = " + txnId);
                 }
@@ -109,7 +110,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                 } catch (RecordException e) {
                     LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> " +
                             "findDuplicateAndMissingData -> " + FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MYSQL_DB.getValue() +
-                            " gstin: " + gstin + " and TxnId: " + txnId + " >> ERROR >> " + e);
+                            " gstin: " + gstin + " and TxnId: " + txnId + " >> ERROR: " + e);
                     invMap.put(DATA.getValue(), FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MYSQL_DB.getValue() + " gstin = " +
                             gstin + " and txnId = " + txnId);
                 }
@@ -122,7 +123,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
                 } catch (RecordException e) {
                     LOGGER.log(Level.SEVERE, "ERROR : CLASS >> FindDuplicateAndMissingServiceImpl >> METHOD >> " +
                             "findDuplicateAndMissingData -> " + FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MONGO_DB.getValue() +
-                            " gstin: " + gstin + " and TxnId: " + txnId +  " >> ERROR >> " + e);
+                            " gstin: " + gstin + " and TxnId: " + txnId +  " >> ERROR: " + e);
                     invMap.put(DATA.getValue(), FAILED_TO_FETCH_DUPLICATE_DATA_FROM_MONGO_DB.getValue() + " gstin = " +
                             gstin + " and txnId = " + txnId);
                 }
@@ -171,7 +172,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
 
         } catch (RecordException re) {
             LOGGER.log(Level.SEVERE, "findDuplicateAndMissingServiceImpl :: getDuplicateDataMysql :: " +
-                    FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST + " >> Error >> " + re);
+                    FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST + " >> Error: " + re);
             throw new RecordException(ErrorCode.FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST);
         }
 
@@ -215,7 +216,7 @@ public class FindDuplicateAndMissingServiceImpl implements FindDuplicateAndMissi
             }
         } catch (RecordException re) {
             LOGGER.log(Level.SEVERE, "ERROR : FindDuplicateAndMissingServiceImpl >> METHOD >> getDuplicateDataMongo -> "
-                    + FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST + " >> ERROR >> " + re);
+                    + FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST + " >> ERROR: " + re);
             throw new RecordException(ErrorCode.FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST);
         }
         LOGGER.log(Level.INFO, "END : CLASS >> FindDuplicateAndMissingServiceImpl >> getDuplicateDataMongo " +

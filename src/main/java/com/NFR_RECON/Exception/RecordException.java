@@ -11,5 +11,4 @@ public class RecordException extends RuntimeException {
         super(message.getMessage());
         this.errorCode = message;
     }
-
 }

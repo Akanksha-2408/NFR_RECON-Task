@@ -1,7 +1,7 @@
-package com.NFR_RECON.Controller;
+package com.NFR_RECON.Controller.Recon;
 
 import com.NFR_RECON.Exception.RecordException;
-import com.NFR_RECON.Service.FindDuplicateAndMissingService;
+import com.NFR_RECON.Service.Recon.FindDuplicateAndMissingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

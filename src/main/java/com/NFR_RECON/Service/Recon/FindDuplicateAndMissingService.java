@@ -1,4 +1,4 @@
-package com.NFR_RECON.Service;
+package com.NFR_RECON.Service.Recon;
 
 import com.NFR_RECON.DTO.InvDataDto;
 import com.NFR_RECON.DTO.InvDetailDataDto;
@@ -7,7 +7,6 @@ import com.NFR_RECON.Entity.Entity_Mysql;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 public interface FindDuplicateAndMissingService {
 
