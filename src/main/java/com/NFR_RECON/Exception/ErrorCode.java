@@ -15,6 +15,7 @@ public enum ErrorCode {
     FAILED_TO_ADD_DUPLICATE_RECORD_IN_LIST("FTADRIL", "Failed to add duplicate data records in list", HttpStatus.INTERNAL_SERVER_ERROR),
     FAILED_TO_ADD_MISSING_RECORD_IN_LIST("FTAMRIL", "Failed to add missing data records in list", HttpStatus.INTERNAL_SERVER_ERROR),
     FAILED_TO_SAVE_INVOICES("FTSI", "Failed to save invoices", HttpStatus.INTERNAL_SERVER_ERROR),
+    UPDATE_FAIL("UF", "Failed to update subscription details", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
     private final String code;

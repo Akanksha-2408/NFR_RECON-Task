@@ -7,7 +7,8 @@ public interface IUpdateSubsService {
 
     String getLatestSubscriptionId(String gstin, String productName);
 
-    boolean updateAll(String endDate, String subscriptionId, String updatedAt);
+    boolean updateAll(Long Id, String endDate, String subscriptionId, String updatedAt);
 
-    String verifyRequest(String gstin, String productName, String feature, String endDate);
+    // TODO: Handle key empty case
+    String verifyRequest(String gstin, String feature, String productName, String endDate);
 }

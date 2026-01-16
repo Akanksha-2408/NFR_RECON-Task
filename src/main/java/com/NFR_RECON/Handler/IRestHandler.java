@@ -1,18 +1,22 @@
 package com.NFR_RECON.Handler;
 
+import com.NFR_RECON.DTO.UpdateSubscriptionRequest;
 import com.NFR_RECON.Exception.GSPException;
 import org.springframework.http.ResponseEntity;
 import java.util.Map;
 
 public interface IRestHandler {
 
-    // update username by Einvoice Id
+
+    // ----- Update-Einvoice-Username API -----
     ResponseEntity<Map<String, Object>> updateUserName(String gstin, String userName) throws GSPException;
 
-    // save invoices
+
+    // ----- Save-Invoices API -----
     ResponseEntity<Map<String, Object>> saveInvoices(Object object) throws GSPException;
 
-    // update subscription details
-    ResponseEntity<Map<String, Object>> updateSubsDetails(String gstin, String productName, String feature,
-                                                          String endDate) throws GSPException;
+
+    // ----- Update-Subscription-Details API -----
+    ResponseEntity<Map<String, Object>> updateAddonDate(UpdateSubscriptionRequest request) throws GSPException;
+
 }

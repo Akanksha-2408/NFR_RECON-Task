@@ -1,8 +1,8 @@
 package com.NFR_RECON.Interceptor;
 
-import com.NFR_RECON.Constants.ResponseMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +17,10 @@ public class RequestInterceptor implements HandlerInterceptor {
     public static final Logger LOGGER = Logger.getLogger(RequestInterceptor.class.getName());
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(@NonNull HttpServletRequest request,
+                             @NonNull HttpServletResponse response,
+                             @NonNull Object handler) throws Exception {
+
         LOGGER.log(Level.INFO, "START >> CLASS: RequestInterceptor >> METHOD: preHandle");
 
         String token = request.getHeader("Authorization");
@@ -27,7 +30,7 @@ public class RequestInterceptor implements HandlerInterceptor {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Authorization Failed ! Token is null");
             LOGGER.log(Level.INFO, "AUTHORIZATION FAILED >> CLASS: RequestInterceptor >> METHOD: preHandle >> " +
-                    "Token is null");
+                    "Token is null.");
             return false;
         } else {
 
@@ -46,8 +49,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Authorization Failed ! Username and password fields are Empty");
                 LOGGER.log(Level.INFO, "AUTHORIZATION FAILED >> CLASS: RequestInterceptor >> " +
-                        "METHOD: preHandle >> Empty Username and Password fields" +
-                        ResponseMessage.AUTHORIZATION_FAIL);
+                        "METHOD: preHandle >> Empty Username and Password fields.");
                 return false;
 
             } else {
@@ -56,7 +58,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 if(username.equals("Perennial") && password.equals("Pere@12345")) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     LOGGER.log(Level.INFO, "AUTHORIZATION SUCCESSFUL >> CLASS: RequestInterceptor >> " +
-                            "METHOD: prehandle >> ");
+                            "METHOD: prehandle");
                     return true;
                 } else {
 
@@ -64,7 +66,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.getWriter().write("Authorization Failed ! Wrong Username or Password");
                     LOGGER.log(Level.INFO, "AUTHORIZATION FAILED >> CLASS: RequestInterceptor >> " +
-                            "METHOD: prehandle >> Wrong Username and Password. ");
+                            "METHOD: prehandle >> Wrong Username and Password.");
                     return false;
                 }
             }

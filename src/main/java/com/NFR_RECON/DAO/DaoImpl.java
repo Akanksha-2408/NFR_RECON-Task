@@ -23,7 +23,7 @@ public class DaoImpl implements Dao {
     @Override
     public int updateBySqlQuery(String dbQuery, List<KeyValue> conditions) throws GSPException {
         Session session = null;
-        int result = 0;
+        int result;
         try {
             session = sessionFactory.openSession();
             session.getTransaction().begin();

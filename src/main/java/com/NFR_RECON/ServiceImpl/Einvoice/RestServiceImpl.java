@@ -16,7 +16,7 @@ public class RestServiceImpl implements IRestService {
     private Dao dao;
 
     @Override
-    public long getEinvGstinDetailsIdByGstinAndUserName(String gstin) {
+    public long getEinvGstinDetailsIdByGstin(String gstin) {
         List<KeyValue> conditions = new ArrayList<>();
         conditions.add(new KeyValue("gstin", gstin));
         List<Object[]> idList = dao.executeSqlQuery(DBQueries.GET_EINV_GSTIN_DETAILS_ID_BY_GSTIN, conditions);
