@@ -1,13 +1,13 @@
 package com.NFR_RECON.Handler.HandlerImpl;
 
 import com.NFR_RECON.Constants.ResponseMessage;
-import com.NFR_RECON.DTO.UpdateSubscriptionRequest;
+import com.NFR_RECON.DTO.AddonDateExtensionRequest;
 import com.NFR_RECON.Exception.GSPException;
 import com.NFR_RECON.Handler.IRestHandler;
 import com.NFR_RECON.Handler.ResponseHandler;
 import com.NFR_RECON.Service.Einvoice.IRestService;
 import com.NFR_RECON.Service.Invoices.SaveInvoicesService;
-import com.NFR_RECON.Service.Subscription.IUpdateSubsService;
+import com.NFR_RECON.Service.Addon.IUpdateAddonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class RestHandlerImpl implements IRestHandler {
     private SaveInvoicesService saveInvoicesService;
 
     @Autowired
-    private IUpdateSubsService updateSubsService;
+    private IUpdateAddonService updateSubsService;
 
     public static Long serviceSubsId = null;
     public static final Logger LOGGER = Logger.getLogger(RestHandlerImpl.class.getName());
@@ -91,20 +91,27 @@ public class RestHandlerImpl implements IRestHandler {
      * @throws GSPException throws GSPException
      */
     @Override
-    public ResponseEntity<Map<String, Object>> updateAddonDate(UpdateSubscriptionRequest request) throws GSPException {
+    public ResponseEntity<Map<String, Object>> updateAddonDate(AddonDateExtensionRequest request) throws GSPException {
 
         LOGGER.log(Level.INFO, "START >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> gstin: " +
                 request.getGstin_number());
+
+        ResponseEntity<Map<String, Object>> result;
 
         String gstin = request.getGstin_number();
         String feature = request.getFeature();
         String productName = request.getProduct_name();
         String endDate = request.getEnd_date();
 
-        //TODO
-        String missingFields = updateSubsService.verifyRequest(gstin, feature, productName, endDate);
+        String data = updateSubsService.verifyRequest(gstin, feature, productName, endDate);
+        String inner = data.substring(1, data.length()-1);
+        String[] invalidFields = inner.split("], \\[");
+        invalidFields[0] = invalidFields[0] + "]";
+        invalidFields[1] = "[" + invalidFields[1];
+        String missingFields = invalidFields[0];
+        String nullFields = invalidFields[1];
 
-        if(Objects.equals(missingFields, "[]")) {
+        if(Objects.equals(missingFields, "[]") && Objects.equals(nullFields, "[]")) {
 
             if (updateSubsService.checkExistance(gstin, feature)) {
 
@@ -120,7 +127,7 @@ public class RestHandlerImpl implements IRestHandler {
                         LOGGER.log(Level.INFO, "END >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
                                 "gstin: " + request.getGstin_number() + " " + ResponseMessage.UPDATE_SUCCESSFUL);
 
-                        return new ResponseEntity<>(
+                        result =  new ResponseEntity<>(
                                 ResponseHandler.success(ResponseMessage.UPDATE_SUCCESSFUL),
                                 HttpStatus.OK);
 
@@ -129,7 +136,7 @@ public class RestHandlerImpl implements IRestHandler {
                         LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
                                 "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.UPDATE_FAIL);
 
-                        return new ResponseEntity<>(
+                        result =  new ResponseEntity<>(
                                 ResponseHandler.error(ResponseMessage.UPDATE_FAIL),
                                 HttpStatus.INTERNAL_SERVER_ERROR);
                     }
@@ -139,7 +146,7 @@ public class RestHandlerImpl implements IRestHandler {
                     LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
                             "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.NULL_SUBSCRIPTION_ID);
 
-                    return new ResponseEntity<>(
+                    result =  new ResponseEntity<>(
                             ResponseHandler.error(ResponseMessage.NULL_SUBSCRIPTION_ID),
                             HttpStatus.NOT_FOUND);
                 }
@@ -150,21 +157,43 @@ public class RestHandlerImpl implements IRestHandler {
                         "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.INVALID_ENTRY +
                         " with gstin: " + gstin + " and feature: " + feature);
 
-                return new ResponseEntity<>(
+                result =  new ResponseEntity<>(
                         ResponseHandler.error(ResponseMessage.INVALID_ENTRY + "with gstin: " + gstin +
                                 " and feature: " + feature),
                         HttpStatus.NOT_FOUND);
+
             }
+
+        } else if(!Objects.equals(missingFields, "[]") && Objects.equals(nullFields, "[]")) {
+
+            LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
+                    "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.INVALID_REQUEST_MISSING_FIELDS +
+                    missingFields);
+
+            result = new ResponseEntity<>(
+                    ResponseHandler.error(ResponseMessage.INVALID_REQUEST_MISSING_FIELDS + missingFields),
+                    HttpStatus.NOT_FOUND);
+
+        }  else if(!Objects.equals(nullFields, "[]") && Objects.equals(missingFields, "[]")) {
+
+            LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
+                    "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.INVALID_REQUEST_NULL_FIELDS +
+                    nullFields);
+
+            result = new ResponseEntity<>(
+                    ResponseHandler.error(ResponseMessage.INVALID_REQUEST_NULL_FIELDS + nullFields),
+                    HttpStatus.NOT_FOUND);
 
         } else {
 
             LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
                     "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.INVALID_REQUEST +
-                    missingFields);
+                    nullFields);
 
-            return new ResponseEntity<>(
-                    ResponseHandler.error(ResponseMessage.INVALID_REQUEST + missingFields),
-                    HttpStatus.NOT_FOUND);
+            result = new ResponseEntity<>(
+                    ResponseHandler.error(ResponseMessage.INVALID_REQUEST + "Missing fields: " + missingFields +
+                            " and Null fields: " + nullFields), HttpStatus.NOT_FOUND);
         }
+        return result;
     }
 }

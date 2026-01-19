@@ -1,18 +1,22 @@
-package com.NFR_RECON.ServiceImpl.Subscription;
+package com.NFR_RECON.ServiceImpl.Addon;
 
 import com.NFR_RECON.Constants.DBQueries;
 import com.NFR_RECON.DAO.Dao;
 import com.NFR_RECON.Entity.KeyValue;
+import com.NFR_RECON.Exception.ErrorCode;
+import com.NFR_RECON.Exception.GSPException;
 import com.NFR_RECON.Handler.HandlerImpl.RestHandlerImpl;
-import com.NFR_RECON.Service.Subscription.IUpdateSubsService;
+import com.NFR_RECON.Service.Addon.IUpdateAddonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import static com.NFR_RECON.Constants.Enum.Products.EWAY_BILL;
+import static com.NFR_RECON.Constants.Enum.Products.GSTR;
 
 @Service
-public class UpdateSubsServiceImpl implements IUpdateSubsService {
+public class UpdateAddonImpl implements IUpdateAddonService {
 
     @Autowired
     private Dao dao;
@@ -26,8 +30,7 @@ public class UpdateSubsServiceImpl implements IUpdateSubsService {
      * @return boolean value
      */
     @Override
-    public boolean checkExistance(String gstin, String feature)
-    {
+    public boolean checkExistance(String gstin, String feature) {
         List<KeyValue> conditions = new ArrayList<>();
         conditions.add(new KeyValue("gstin", gstin));
         conditions.add(new KeyValue("feature", feature));
@@ -36,8 +39,9 @@ public class UpdateSubsServiceImpl implements IUpdateSubsService {
             Object list = values.get(0);
             RestHandlerImpl.serviceSubsId = Long.parseLong(list.toString());
             return true;
+
         } else {
-        return false;
+            return false;
         }
     }
 
@@ -52,29 +56,33 @@ public class UpdateSubsServiceImpl implements IUpdateSubsService {
     @Override
     public String getLatestSubscriptionId(String gstin, String productName) {
         List<KeyValue> conditions = new ArrayList<>();
-        List<Object[]> subIdList;
+        List<Object[]> subIdList = List.of();
         Long gstinId;
         String result;
 
         conditions.add(new KeyValue("gstin", gstin));
         List<Object[]> data = dao.executeSqlQuery(DBQueries.GET_GSTIN_ID_FROM_GSTIN_NUMBER, conditions);
-        // TODO: If data is null, then throw a user-friendly message
+        if(!data.isEmpty()) {
+            throw new GSPException(ErrorCode.GSTIN_ID_NOT_FOUND + gstin);
+        }
         Object list = data.get(0);
         gstinId = Long.parseLong(list.toString());
         conditions.clear();
         conditions.add(new KeyValue("gstinId", gstinId));
 
-        //TODO: Use enum for product name
-        if(Objects.equals(productName, "GSTR")) {
+        if(Objects.equals(productName, GSTR.name())) {
             subIdList = dao.executeSqlQuery(DBQueries.GET_GSTR_SUBSCRIPTION_ID, conditions);
-        } else if(Objects.equals(productName, "EWAYBILL")) {
+        } else if(Objects.equals(productName, EWAY_BILL.name())) {
             subIdList = dao.executeSqlQuery(DBQueries.GET_EWB_SUBSCRIPTION_ID, conditions);
-        } else {
+        } else if(!Objects.equals(productName, GSTR.name()) &&
+                !Objects.equals(productName, EWAY_BILL.name())) {
             subIdList = dao.executeSqlQuery(DBQueries.GET_PRODUCT_SUBSCRIPTION_ID, conditions);
         }
 
-        // TODO: if subscription id not found throw error msg - empty/ null
         Object subId = subIdList.get(0);
+        if(subId == null || subIdList.isEmpty()) {
+            throw new GSPException(ErrorCode.SUBSCRIPTION_ID_NOT_FOUND + gstin);
+        }
         result = subId.toString();
         return result;
     }

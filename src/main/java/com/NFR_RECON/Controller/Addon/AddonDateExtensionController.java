@@ -1,6 +1,6 @@
-package com.NFR_RECON.Controller.Subscription;
+package com.NFR_RECON.Controller.Addon;
 
-import com.NFR_RECON.DTO.UpdateSubscriptionRequest;
+import com.NFR_RECON.DTO.AddonDateExtensionRequest;
 import com.NFR_RECON.Exception.ErrorCode;
 import com.NFR_RECON.Exception.GSPException;
 import com.NFR_RECON.Handler.IRestHandler;
@@ -31,7 +31,7 @@ public class AddonDateExtensionController {
      * @return Response: Response Message, HttpStatus
      */
     @PutMapping("addon-date-extension")
-    public ResponseEntity<Map<String, Object>> addonDateExtension(@RequestBody UpdateSubscriptionRequest request) {
+    public ResponseEntity<Map<String, Object>> addonDateExtension(@RequestBody AddonDateExtensionRequest request) {
 
         LOGGER.log(Level.INFO, "START >> CLASS : updateSubscriptionDetailsController >> METHOD : " +
                 "updateSubscriptionDetails >> gstin : " + request.getGstin_number());

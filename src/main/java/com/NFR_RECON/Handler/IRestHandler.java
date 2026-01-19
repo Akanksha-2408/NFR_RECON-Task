@@ -1,6 +1,6 @@
 package com.NFR_RECON.Handler;
 
-import com.NFR_RECON.DTO.UpdateSubscriptionRequest;
+import com.NFR_RECON.DTO.AddonDateExtensionRequest;
 import com.NFR_RECON.Exception.GSPException;
 import org.springframework.http.ResponseEntity;
 import java.util.Map;
@@ -17,6 +17,6 @@ public interface IRestHandler {
 
 
     // ----- Update-Subscription-Details API -----
-    ResponseEntity<Map<String, Object>> updateAddonDate(UpdateSubscriptionRequest request) throws GSPException;
+    ResponseEntity<Map<String, Object>> updateAddonDate(AddonDateExtensionRequest request) throws GSPException;
 
 }

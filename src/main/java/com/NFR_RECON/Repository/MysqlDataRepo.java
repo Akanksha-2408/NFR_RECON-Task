@@ -12,4 +12,5 @@ public interface MysqlDataRepo extends CrudRepository<Entity_Mysql, Long> {
 
     @Query("Select c from Entity_Mysql c where c.gstin = :gstin and c.txn_id = :txn_id")
     List<Entity_Mysql> getAll(@Param("gstin") String gstin, @Param("txn_id") String txn_id);
+
 }
