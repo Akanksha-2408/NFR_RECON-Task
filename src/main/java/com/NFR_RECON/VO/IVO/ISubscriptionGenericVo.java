@@ -1,4 +1,4 @@
-package com.NFR_RECON.Entity.VO.IVO;
+package com.NFR_RECON.VO.IVO;
 
 import java.util.Date;
 

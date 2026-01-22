@@ -10,6 +10,7 @@ import com.NFR_RECON.Service.Addon.IUpdateAddonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import static com.NFR_RECON.Constants.Enum.Products.EWAY_BILL;
@@ -94,16 +95,15 @@ public class UpdateAddonImpl implements IUpdateAddonService {
      * @param Id Primary key of Value_Added_Service_Subscription table
      * @param endDate endDate
      * @param subscriptionId subscriptionId
-     * @param updatedAt updatedAt
      * @return boolean value
      */
     @Override
-    public boolean updateAll(Long Id, String endDate, String subscriptionId, String updatedAt) {
+    public boolean updateAll(Long Id, String endDate, String subscriptionId) {
         List<KeyValue> conditions = new ArrayList<>();
         conditions.add(new KeyValue("Id", Id));
         conditions.add(new KeyValue("endDate", endDate));
         conditions.add(new KeyValue("subscriptionId", subscriptionId));
-        conditions.add(new KeyValue("updatedAt", updatedAt));
+        conditions.add(new KeyValue("updatedAt", new Date()));
         int result = dao.updateBySqlQuery(DBQueries.UPDATE_SUBSCRIPTION_DETAILS, conditions);
         return result != 0;
     }

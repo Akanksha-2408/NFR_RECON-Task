@@ -15,7 +15,9 @@ public interface ResponseMessage {
     String INVALID_REQUEST_NULL_FIELDS = " Invalid Request! Null required fields: ";
     String INVALID_ENTRY = "No entry found ";
     String UPDATE_SUCCESSFUL = "Successfully updated End Date, Subscription Id and Updated At fields";
+    String STATUS_UPDATED_SUCCESSFULLY = "Successfully updated Reconcilation Status";
+    String NO_RECORDS_FOUND = "No records to update !";
     String UPDATE_FAIL = "Failed to update End Date, Subscription Id and Updated At fields";
-    String BAD_REQUEST = "Bad Request! Empty request body";
+    String INVALID_DATA = "Inappropriate data found";
 
 }

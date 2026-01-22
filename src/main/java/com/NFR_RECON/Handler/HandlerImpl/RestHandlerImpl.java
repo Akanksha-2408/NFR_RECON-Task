@@ -2,20 +2,20 @@ package com.NFR_RECON.Handler.HandlerImpl;
 
 import com.NFR_RECON.Constants.ResponseMessage;
 import com.NFR_RECON.DTO.AddonDateExtensionRequest;
+import com.NFR_RECON.DTO.ReturnPeriodResponse;
 import com.NFR_RECON.Exception.GSPException;
 import com.NFR_RECON.Handler.IRestHandler;
 import com.NFR_RECON.Handler.ResponseHandler;
 import com.NFR_RECON.Service.Einvoice.IRestService;
 import com.NFR_RECON.Service.Invoices.SaveInvoicesService;
 import com.NFR_RECON.Service.Addon.IUpdateAddonService;
+import com.NFR_RECON.Service.Recon.UpdateReconStatusService;
+import com.NFR_RECON.Util.GeneralUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,13 +29,25 @@ public class RestHandlerImpl implements IRestHandler {
     private SaveInvoicesService saveInvoicesService;
 
     @Autowired
-    private IUpdateAddonService updateSubsService;
+    private IUpdateAddonService updateAddonService;
+
+    @Autowired
+    private UpdateReconStatusService updateReconStatusService;
 
     public static Long serviceSubsId = null;
     public static final Logger LOGGER = Logger.getLogger(RestHandlerImpl.class.getName());
 
 
     // ----- Update-Einvoice-Username API -----
+    /**
+     * @author Akanksha Senad
+     * @since
+     * @Description Updates username by gstin_number
+     * @param gstin gstin number
+     * @param userName username
+     * @return response
+     * @throws GSPException throws GSPException
+     */
     @Override
     public ResponseEntity<Map<String, Object>> updateUserName(String gstin, String userName) throws GSPException {
 
@@ -68,6 +80,14 @@ public class RestHandlerImpl implements IRestHandler {
 
 
     // ----- Save-Invoices API -----
+    /**
+     * @author Akanksha Senad
+     * @since
+     * @Description Accepts input data from random service and saves it to database
+     * @param object Generalized object since method will get input from random service
+     * @return response
+     * @throws GSPException throws GSPException
+     */
     @Override
     public ResponseEntity<Map<String, Object>> saveInvoices(Object object) throws GSPException {
         ResponseEntity<Map<String, Object>> result = null;
@@ -103,7 +123,8 @@ public class RestHandlerImpl implements IRestHandler {
         String productName = request.getProduct_name();
         String endDate = request.getEnd_date();
 
-        String data = updateSubsService.verifyRequest(gstin, feature, productName, endDate);
+        String data = updateAddonService.verifyRequest(gstin, feature, productName, endDate);
+        // Recommended to use isBlank() directly from StringUtil class
         String inner = data.substring(1, data.length()-1);
         String[] invalidFields = inner.split("], \\[");
         invalidFields[0] = invalidFields[0] + "]";
@@ -113,16 +134,13 @@ public class RestHandlerImpl implements IRestHandler {
 
         if(Objects.equals(missingFields, "[]") && Objects.equals(nullFields, "[]")) {
 
-            if (updateSubsService.checkExistance(gstin, feature)) {
+            if (updateAddonService.checkExistance(gstin, feature)) {
 
-                Date date = new Date();
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                String updatedAt = formatter.format(date);
-                String subscriptionId = updateSubsService.getLatestSubscriptionId(gstin, productName);
+                String subscriptionId = updateAddonService.getLatestSubscriptionId(gstin, productName);
 
                 if (subscriptionId != null) {
 
-                    if (updateSubsService.updateAll(serviceSubsId, endDate, subscriptionId, updatedAt)) {
+                    if (updateAddonService.updateAll(serviceSubsId, endDate, subscriptionId)) {
 
                         LOGGER.log(Level.INFO, "END >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
                                 "gstin: " + request.getGstin_number() + " " + ResponseMessage.UPDATE_SUCCESSFUL);
@@ -132,31 +150,18 @@ public class RestHandlerImpl implements IRestHandler {
                                 HttpStatus.OK);
 
                     } else {
-
-                        LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
-                                "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.UPDATE_FAIL);
-
                         result =  new ResponseEntity<>(
                                 ResponseHandler.error(ResponseMessage.UPDATE_FAIL),
                                 HttpStatus.INTERNAL_SERVER_ERROR);
                     }
 
                 } else {
-
-                    LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
-                            "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.NULL_SUBSCRIPTION_ID);
-
                     result =  new ResponseEntity<>(
                             ResponseHandler.error(ResponseMessage.NULL_SUBSCRIPTION_ID),
                             HttpStatus.NOT_FOUND);
                 }
 
             } else {
-
-                LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
-                        "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.INVALID_ENTRY +
-                        " with gstin: " + gstin + " and feature: " + feature);
-
                 result =  new ResponseEntity<>(
                         ResponseHandler.error(ResponseMessage.INVALID_ENTRY + "with gstin: " + gstin +
                                 " and feature: " + feature),
@@ -165,35 +170,68 @@ public class RestHandlerImpl implements IRestHandler {
             }
 
         } else if(!Objects.equals(missingFields, "[]") && Objects.equals(nullFields, "[]")) {
-
-            LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
-                    "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.INVALID_REQUEST_MISSING_FIELDS +
-                    missingFields);
-
             result = new ResponseEntity<>(
                     ResponseHandler.error(ResponseMessage.INVALID_REQUEST_MISSING_FIELDS + missingFields),
                     HttpStatus.NOT_FOUND);
 
         }  else if(!Objects.equals(nullFields, "[]") && Objects.equals(missingFields, "[]")) {
-
-            LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
-                    "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.INVALID_REQUEST_NULL_FIELDS +
-                    nullFields);
-
             result = new ResponseEntity<>(
                     ResponseHandler.error(ResponseMessage.INVALID_REQUEST_NULL_FIELDS + nullFields),
                     HttpStatus.NOT_FOUND);
 
         } else {
-
-            LOGGER.log(Level.SEVERE, "ERROR >> CLASS : RestHandlerImpl >> METHOD : updateAddonDate >> " +
-                    "gstin: " + request.getGstin_number() + " >> Error: " + ResponseMessage.INVALID_REQUEST +
-                    nullFields);
-
             result = new ResponseEntity<>(
                     ResponseHandler.error(ResponseMessage.INVALID_REQUEST + "Missing fields: " + missingFields +
                             " and Null fields: " + nullFields), HttpStatus.NOT_FOUND);
         }
         return result;
     }
+
+
+    // ----- Update-Recon-Status -----
+
+    /**
+     * @author Akanksha Senad
+     * @since 22/01/2026
+     * @Description Updates reconcilation status of all return periods from from_return_period to to_return_period
+     * @param gstinNumber gstin number
+     * @param gstinId gstin id
+     * @return response
+     * @throws GSPException throws GSP Exception
+     */
+    @Override
+    public ResponseEntity<Map<String, Object>> updateReconStatus(String gstinNumber, Long gstinId) throws GSPException {
+        LOGGER.log(Level.INFO, "START >> CLASS: RestHandlerImpl >> METHOD: updateReconStatus >> gstin number: "
+                + gstinNumber + " and gstinId: " + gstinId);
+
+        ResponseEntity<Map<String, Object>> result;
+
+        // 1. Get from_return_period and to_return_period
+        ReturnPeriodResponse retPrd  = updateReconStatusService.getGstr2BLatestMMReconDetails(gstinNumber);
+        String from_retprd = retPrd.getGstr2b_from_rtnprd();
+        String to_retprd = retPrd.getGstr2b_to_rtnprd();
+
+        // 2. get Return period list
+        Set<String> ReturnPrd = GeneralUtil.getReturnPeriodList(from_retprd, to_retprd);
+        List<String> RetPrd = new ArrayList<>(ReturnPrd);
+
+        // 3. update Recon status
+        int count = updateReconStatusService.updateReconStatus(gstinId, "GSTR2B", RetPrd);
+        if(count > 0) {
+            result = new ResponseEntity<>(ResponseHandler.success(ResponseMessage.STATUS_UPDATED_SUCCESSFULLY),
+                    HttpStatus.OK);
+        } else {
+            LOGGER.log(Level.INFO, "NOT FOUND >> CLASS: RestHandlerImpl >> METHOD: updateReconStatus >> gstin: "
+                    + gstinNumber + " and gstinId: " + gstinId + ResponseMessage.NO_RECORDS_FOUND);
+
+            result = new ResponseEntity<>(ResponseHandler.error(ResponseMessage.NO_RECORDS_FOUND),
+                    HttpStatus.NOT_FOUND);
+        }
+
+        LOGGER.log(Level.INFO, "END >> CLASS: RestHandlerImpl >> METHOD: updateReconStatus >> gstin: "
+                + gstinNumber + " and gstinId: " + gstinId);
+
+        return result;
+    }
+
 }

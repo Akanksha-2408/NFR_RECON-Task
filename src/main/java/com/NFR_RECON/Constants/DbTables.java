@@ -14,5 +14,8 @@ public interface DbTables {
     String TBL_PURCHASED_ADDONS = "purchased_addons";
     String TBL_GSTIN = "gstin";
     String TBL_GSTIN_DETAILS = "gstin_details";
+    String TBL_TRANSACTION_MANAGER = "transaction_manager";
+    String TBL_LATEST_GSTR2B_MULTIMONTH_RECON_DETAILS = "gstr2b_latest_mmrecon_details";
+    String TBL_USER = "user";
 
 }

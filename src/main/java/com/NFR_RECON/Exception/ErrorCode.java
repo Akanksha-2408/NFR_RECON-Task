@@ -16,6 +16,7 @@ public enum ErrorCode {
     FAILED_TO_ADD_MISSING_RECORD_IN_LIST("FTAMRIL", "Failed to add missing data records in list", HttpStatus.INTERNAL_SERVER_ERROR),
     FAILED_TO_SAVE_INVOICES("FTSI", "Failed to save invoices", HttpStatus.INTERNAL_SERVER_ERROR),
     UPDATE_FAIL("UF", "Failed to update subscription details", HttpStatus.INTERNAL_SERVER_ERROR),
+    UPDATE_FAILURE("UFE", "Failed to update Reconcilation Status", HttpStatus.INTERNAL_SERVER_ERROR),
     GSTIN_ID_NOT_FOUND("GINF", "No Gstin ID found with Gstin number: ", HttpStatus.NOT_FOUND),
     SUBSCRIPTION_ID_NOT_FOUND("SNF", "Subscription ID Not found with gstin number: ", HttpStatus.NOT_FOUND),
     ;

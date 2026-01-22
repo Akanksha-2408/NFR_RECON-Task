@@ -1,7 +1,7 @@
 package com.NFR_RECON.ServiceImpl.Invoices;
 
 import com.NFR_RECON.Constants.ResponseMessage;
-import com.NFR_RECON.Entity.VO.InvoiceVO;
+import com.NFR_RECON.VO.InvoiceVO;
 import com.NFR_RECON.Exception.ErrorCode;
 import com.NFR_RECON.Exception.GSPException;
 import com.NFR_RECON.Repository.saveInvoicesRepo;

@@ -1,13 +1,10 @@
-package com.NFR_RECON.Entity.VO;
-
-
+package com.NFR_RECON.VO;
 
 import java.util.Date;
-import java.util.Set;
 
 import com.NFR_RECON.Constants.DbTables;
-import com.NFR_RECON.Entity.VO.IVO.ISubscriptionGenericVo;
 import com.NFR_RECON.Util.StringUtil;
+import com.NFR_RECON.VO.IVO.ISubscriptionGenericVo;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -15,11 +12,11 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
-@Table(name = DbTables.TBL_EWB_SUBSCRIPTION_DETAILS)
+@Table(name = DbTables.TBL_SUBSCRIPTION_DETAILS)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @DynamicInsert()
 @DynamicUpdate()
-public class EwbSubscriptionDetailsVO implements ISubscriptionGenericVo {
+public class SubscriptionDetailsVO implements ISubscriptionGenericVo {
 
     @Id
     @Column(name = "ID")
@@ -52,6 +49,9 @@ public class EwbSubscriptionDetailsVO implements ISubscriptionGenericVo {
     @Column(name = "PAYMENT_MODE", length = 30)
     private String paymentMode;
 
+    @Column(name = "EXTENDED_MONTHS")
+    private int extendedMonths;
+
     @Column(name = "STATUS", length = 30)
     private String status;
 
@@ -63,41 +63,53 @@ public class EwbSubscriptionDetailsVO implements ISubscriptionGenericVo {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    @Column(name = "INVOICE_ID")
-    private String invoiceId;
-
-    @OneToMany(mappedBy = "ewbSubscription", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<PurchasedAddOnVO> purchasedAddons;
-
-    @Column(name = "OTHER_DETAILS")
-    private String otherDetails;
+    @Column(name="RET_ACCESSED_FROM")
+    private Date returnAccessedFrom;
 
     @Column(name="FREE_TRIAL_PERIOD")
     private int freeTrialPeriod;
 
-    @Column(name = "ZOHO_CUSTOMER_ID")
-    private String zohoCustomerId;
+    @Column(name="INVOICE_ID")
+    private String invoiceId;
 
-    @Column(name="PAYER_ID")
+    @Column(name = "PAYER_ID")
     private long payerId;
 
+    @Column(name = "IS_PRACTICE", columnDefinition = "BIT", length = 1)
+    private boolean isPractice;
+
+    @Column(name="IS_MERGED_VIEW",columnDefinition = "BIT", length = 1)
+    private boolean isMergedView;
+
+    @Override
+    public String getInvoiceId() {
+        return invoiceId;
+    }
+
+    @Override
+    public void setInvoiceId(String invoiceId) {
+        this.invoiceId = invoiceId;
+    }
+
+    @Override
     public int getFreeTrialPeriod() {
         return freeTrialPeriod;
     }
 
+    @Override
     public void setFreeTrialPeriod(int freeTrialPeriod) {
         this.freeTrialPeriod = freeTrialPeriod;
     }
 
-    public Set<PurchasedAddOnVO> getPurchasedAddOns() {
-        return purchasedAddons;
+    public Date getReturnAccessedFrom() {
+        return returnAccessedFrom;
     }
 
-    public void setPurchasedAddOns(Set<PurchasedAddOnVO> purchasedAddons) {
-        this.purchasedAddons = purchasedAddons;
+    public void setReturnAccessedFrom(Date returnAccessedFrom) {
+        this.returnAccessedFrom = returnAccessedFrom;
     }
 
-    public EwbSubscriptionDetailsVO() {
+    public SubscriptionDetailsVO() {
         this.setCreatedAt(new Date());
     }
 
@@ -147,6 +159,14 @@ public class EwbSubscriptionDetailsVO implements ISubscriptionGenericVo {
     @Override
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public int getExtendedMonths() {
+        return extendedMonths;
+    }
+
+    public void setExtendedMonths(int extendedMonths) {
+        this.extendedMonths = extendedMonths;
     }
 
     @Override
@@ -217,32 +237,6 @@ public class EwbSubscriptionDetailsVO implements ISubscriptionGenericVo {
         this.updatedAt = updatedAt;
     }
 
-    @Override
-    public String getInvoiceId() {
-        return invoiceId;
-    }
-
-    @Override
-    public void setInvoiceId(String invoiceId) {
-        this.invoiceId = invoiceId;
-    }
-
-    public String getOtherDetails() {
-        return otherDetails;
-    }
-
-    public void setOtherDetails(String otherDetails) {
-        this.otherDetails = otherDetails;
-    }
-
-    public String getZohoCustomerId() {
-        return zohoCustomerId;
-    }
-
-    public void setZohoCustomerId(String zohoCustomerId) {
-        this.zohoCustomerId = zohoCustomerId;
-    }
-
     public long getPayerId() {
         return payerId;
     }
@@ -250,5 +244,20 @@ public class EwbSubscriptionDetailsVO implements ISubscriptionGenericVo {
     public void setPayerId(long payerId) {
         this.payerId = payerId;
     }
-}
 
+    public boolean isPractice() {
+        return isPractice;
+    }
+
+    public void setPractice(boolean isPractice) {
+        this.isPractice = isPractice;
+    }
+    public boolean isMergedView() {
+        return isMergedView;
+    }
+
+    public void setIsMergedView(boolean isMergedView) {
+        this.isMergedView = isMergedView;
+    }
+
+}

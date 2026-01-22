@@ -19,4 +19,8 @@ public interface IRestHandler {
     // ----- Update-Subscription-Details API -----
     ResponseEntity<Map<String, Object>> updateAddonDate(AddonDateExtensionRequest request) throws GSPException;
 
+
+    // ----- Update-Recon-Status -----
+    ResponseEntity<Map<String, Object>> updateReconStatus(String gstinNumber, Long gstinId) throws GSPException;
+
 }

@@ -1,4 +1,4 @@
-package com.NFR_RECON.Entity.VO;
+package com.NFR_RECON.VO;
 
 import com.NFR_RECON.Constants.DbTables;
 import jakarta.persistence.*;

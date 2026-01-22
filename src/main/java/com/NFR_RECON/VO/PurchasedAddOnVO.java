@@ -1,4 +1,4 @@
-package com.NFR_RECON.Entity.VO;
+package com.NFR_RECON.VO;
 
 import java.util.Date;
 

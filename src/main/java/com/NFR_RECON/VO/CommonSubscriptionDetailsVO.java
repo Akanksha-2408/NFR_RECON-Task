@@ -1,10 +1,10 @@
-package com.NFR_RECON.Entity.VO;
+package com.NFR_RECON.VO;
 
 import java.util.Date;
 import java.util.Set;
 
 import com.NFR_RECON.Constants.DbTables;
-import com.NFR_RECON.Entity.VO.IVO.ISubscriptionGenericVo;
+import com.NFR_RECON.VO.IVO.ISubscriptionGenericVo;
 import jakarta.persistence.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
