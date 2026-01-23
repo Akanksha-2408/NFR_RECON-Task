@@ -37,8 +37,8 @@ public class UpdateReconStatusServiceImpl implements UpdateReconStatusService {
             String from_retprd = realData[0].toString();
             String to_retprd = realData[1].toString();
 
-            response.setGstr2b_from_rtnprd(from_retprd);
-            response.setGstr2b_to_rtnprd(to_retprd);
+            response.setGstr2bFromRtnprd(from_retprd);
+            response.setGstr2bToRtnprd(to_retprd);
         }
         return response;
     }
@@ -62,7 +62,6 @@ public class UpdateReconStatusServiceImpl implements UpdateReconStatusService {
         String newStatus = "READY_TO_PROCESS";
         conditions.add(new KeyValue("oldStatus", oldStatus));
         conditions.add(new KeyValue("newStatus", newStatus));
-        int updateCount = dao.updateBySqlQuery(DBQueries.UPDATE_RECON_STATUS, conditions);
-        return updateCount;
+        return dao.updateBySqlQuery(DBQueries.UPDATE_RECON_STATUS, conditions);
     }
 }

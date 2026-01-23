@@ -1,5 +1,6 @@
 package com.NFR_RECON.Handler.HandlerImpl;
 
+import com.NFR_RECON.Constants.Enum.ReturnTypes;
 import com.NFR_RECON.Constants.ResponseMessage;
 import com.NFR_RECON.DTO.AddonDateExtensionRequest;
 import com.NFR_RECON.DTO.ReturnPeriodResponse;
@@ -101,7 +102,7 @@ public class RestHandlerImpl implements IRestHandler {
     }
 
 
-    // ----- Update-Subscription-Details API -----
+    // ----- Update-Addon-End-Date API -----
     /**
      * @author Akanksha Senad
      * @since 15/01/2026
@@ -189,7 +190,6 @@ public class RestHandlerImpl implements IRestHandler {
 
 
     // ----- Update-Recon-Status -----
-
     /**
      * @author Akanksha Senad
      * @since 22/01/2026
@@ -208,15 +208,18 @@ public class RestHandlerImpl implements IRestHandler {
 
         // 1. Get from_return_period and to_return_period
         ReturnPeriodResponse retPrd  = updateReconStatusService.getGstr2BLatestMMReconDetails(gstinNumber);
-        String from_retprd = retPrd.getGstr2b_from_rtnprd();
-        String to_retprd = retPrd.getGstr2b_to_rtnprd();
+        String fromRetprd = retPrd.getGstr2bFromRtnprd();
+        String toRetprd = retPrd.getGstr2bToRtnprd();
 
         // 2. get Return period list
-        Set<String> ReturnPrd = GeneralUtil.getReturnPeriodList(from_retprd, to_retprd);
+        Set<String> ReturnPrd = GeneralUtil.getReturnPeriodList(fromRetprd, toRetprd);
         List<String> RetPrd = new ArrayList<>(ReturnPrd);
 
+        // Set returnType = GSTR2B
+        String returnType = ReturnTypes.GSTR2B.toString();
+
         // 3. update Recon status
-        int count = updateReconStatusService.updateReconStatus(gstinId, "GSTR2B", RetPrd);
+        int count = updateReconStatusService.updateReconStatus(gstinId, returnType, RetPrd);
         if(count > 0) {
             LOGGER.log(Level.INFO, "FOUND >> CLASS: RestHandlerImpl >> METHOD: updateReconStatus >> gstin: "
                     + gstinNumber + " and gstinId: " + gstinId + " >> Status of " + count + " records updated " +
