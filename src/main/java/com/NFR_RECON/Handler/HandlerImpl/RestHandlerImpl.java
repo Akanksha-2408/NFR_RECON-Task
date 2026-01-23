@@ -218,11 +218,15 @@ public class RestHandlerImpl implements IRestHandler {
         // 3. update Recon status
         int count = updateReconStatusService.updateReconStatus(gstinId, "GSTR2B", RetPrd);
         if(count > 0) {
+            LOGGER.log(Level.INFO, "FOUND >> CLASS: RestHandlerImpl >> METHOD: updateReconStatus >> gstin: "
+                    + gstinNumber + " and gstinId: " + gstinId + " >> Status of " + count + " records updated " +
+                    "successfully !");
+
             result = new ResponseEntity<>(ResponseHandler.success(ResponseMessage.STATUS_UPDATED_SUCCESSFULLY),
                     HttpStatus.OK);
         } else {
             LOGGER.log(Level.INFO, "NOT FOUND >> CLASS: RestHandlerImpl >> METHOD: updateReconStatus >> gstin: "
-                    + gstinNumber + " and gstinId: " + gstinId + ResponseMessage.NO_RECORDS_FOUND);
+                    + gstinNumber + " and gstinId: " + gstinId + " Error: " + ResponseMessage.NO_RECORDS_FOUND);
 
             result = new ResponseEntity<>(ResponseHandler.error(ResponseMessage.NO_RECORDS_FOUND),
                     HttpStatus.NOT_FOUND);

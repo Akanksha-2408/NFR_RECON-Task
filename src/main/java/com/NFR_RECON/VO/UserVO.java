@@ -41,7 +41,7 @@ public class UserVO implements Serializable {
     @Column(name = "STATUS", length = 30, nullable = false)
     private String status;
 
-    @Column(name = "UUID", length = 32)
+    @Column(name = "UUID", length = 100)
     private String uuid;
 
     @Column(name = "IS_DELETED", columnDefinition = "BIT", length = 1, nullable = false)
