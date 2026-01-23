@@ -48,19 +48,19 @@ public class GeneralUtil {
 
 
     public static Set<String> getReturnPeriodList(String fromReturnPeriodPR, String toReturnPeriodPR) {
-        Set<String> prRetPeriodList = new HashSet<>();
+        Set<String> gstr2BRetPeriodList = new HashSet<>();
         if (DateFormatUtil.getDateFromReturnPeriod(fromReturnPeriodPR).before(DateFormatUtil.getDateFromReturnPeriod(toReturnPeriodPR))) {
             while (!fromReturnPeriodPR.equals(toReturnPeriodPR)) {
-                prRetPeriodList.add(fromReturnPeriodPR);
+                gstr2BRetPeriodList.add(fromReturnPeriodPR);
                 fromReturnPeriodPR = getNextRetPeriod(fromReturnPeriodPR);
             }
         } else {
-            prRetPeriodList.add(fromReturnPeriodPR);
-            prRetPeriodList.add(toReturnPeriodPR);
+            gstr2BRetPeriodList.add(fromReturnPeriodPR);
+            gstr2BRetPeriodList.add(toReturnPeriodPR);
         }
 
-        prRetPeriodList.add(toReturnPeriodPR);
-        return prRetPeriodList;
+        gstr2BRetPeriodList.add(toReturnPeriodPR);
+        return gstr2BRetPeriodList;
     }
 
 }
