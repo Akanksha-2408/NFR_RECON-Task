@@ -15,6 +15,6 @@ public class DBQueries {
     public static final String UPDATE_SUBSCRIPTION_DETAILS = "UPDATE " + DbTables.TBL_VALUE_ADDED_SERVICE_SUB + " SET end_date = :endDate, subscription_id = :subscriptionId, updated_at = :updatedAt WHERE ID = :Id";
 
     public static final QueryBean GET_GSTR2B_LATEST_MMRECON_DETAILS = new QueryBean("Select gstr2b_from_rtnprd, gstr2b_to_rtnprd FROM " + DbTables.TBL_LATEST_GSTR2B_MULTIMONTH_RECON_DETAILS + " WHERE gstin = :gstin" );
-    public static final String UPDATE_RECON_STATUS = "UPDATE " + DbTables.TBL_TRANSACTION_MANAGER + " SET status = :newStatus WHERE GSTIN_ID = :gstinId AND RETURN_TYPE = :returnType AND STATUS = :oldStatus AND RETURN_PERIOD IN (:RetPrd)";
+    public static final String UPDATE_RECON_STATUS = "UPDATE " + DbTables.TBL_TRANSACTION_MANAGER + " SET status = :newStatus WHERE GSTIN_ID = :gstinId AND RETURN_TYPE = :returnType AND STATUS = :oldStatus AND RETURN_PERIOD IN :RetPrd";
 
 }

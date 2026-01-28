@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -53,7 +54,7 @@ public class UpdateReconStatusServiceImpl implements UpdateReconStatusService {
      * @return count of all the records where status is updated
      */
     @Override
-    public int updateReconStatus(Long gstinId, String returnType, List<String> RetPrd) {
+    public int updateReconStatus(Long gstinId, String returnType, Set<String> RetPrd) {
         List<KeyValue> conditions = new ArrayList<>();
         conditions.add(new KeyValue("gstinId", gstinId));
         conditions.add(new KeyValue("returnType", returnType));
