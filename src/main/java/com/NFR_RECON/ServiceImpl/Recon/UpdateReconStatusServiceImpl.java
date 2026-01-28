@@ -35,11 +35,11 @@ public class UpdateReconStatusServiceImpl implements UpdateReconStatusService {
         ReturnPeriodResponse response = new ReturnPeriodResponse();
         if (data != null && !data.isEmpty()) {
             Object[] realData = Arrays.stream(data.get(0)).toArray();
-            String from_retprd = realData[0].toString();
-            String to_retprd = realData[1].toString();
+            String fromRetprd = realData[0].toString();
+            String toRetprd = realData[1].toString();
 
-            response.setGstr2bFromRtnprd(from_retprd);
-            response.setGstr2bToRtnprd(to_retprd);
+            response.setGstr2bFromRtnprd(fromRetprd);
+            response.setGstr2bToRtnprd(toRetprd);
         }
         return response;
     }

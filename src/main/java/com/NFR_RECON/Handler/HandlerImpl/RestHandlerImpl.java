@@ -212,13 +212,13 @@ public class RestHandlerImpl implements IRestHandler {
         String toRetprd = retPrd.getGstr2bToRtnprd();
 
         // 2. get Return period list
-        Set<String> ReturnPrd = GeneralUtil.getReturnPeriodList(fromRetprd, toRetprd);
+        Set<String> returnPrd = GeneralUtil.getReturnPeriodList(fromRetprd, toRetprd);
 
         // Set returnType = GSTR2B
         String returnType = ReturnTypes.GSTR2B.toString();
 
         // 3. update Recon status
-        int count = updateReconStatusService.updateReconStatus(gstinId, returnType, ReturnPrd);
+        int count = updateReconStatusService.updateReconStatus(gstinId, returnType, returnPrd);
         if(count > 0) {
             LOGGER.log(Level.INFO, "FOUND >> CLASS: RestHandlerImpl >> METHOD: updateReconStatus >> gstin: "
                     + gstinNumber + " and gstinId: " + gstinId + " >> Status of " + count + " records updated " +
