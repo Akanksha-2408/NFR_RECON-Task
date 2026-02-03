@@ -57,31 +57,35 @@ public class UpdateAddonImpl implements IUpdateAddonService {
     @Override
     public String getLatestSubscriptionId(String gstin, String productName) {
         List<KeyValue> conditions = new ArrayList<>();
-        List<Object[]> subIdList = List.of();
+        List<Object[]> subIdList;
         Long gstinId;
         String result;
 
         conditions.add(new KeyValue("gstin", gstin));
         List<Object[]> data = dao.executeSqlQuery(DBQueries.GET_GSTIN_ID_FROM_GSTIN_NUMBER, conditions);
-        if(!data.isEmpty()) {
+        if(data.isEmpty()) {
             throw new GSPException(ErrorCode.GSTIN_ID_NOT_FOUND + gstin);
         }
         Object list = data.get(0);
         gstinId = Long.parseLong(list.toString());
         conditions.clear();
-        conditions.add(new KeyValue("gstinId", gstinId));
 
         if(Objects.equals(productName, GSTR.name())) {
+            conditions.add(new KeyValue("gstinId", gstinId));
             subIdList = dao.executeSqlQuery(DBQueries.GET_GSTR_SUBSCRIPTION_ID, conditions);
+            conditions.clear();
         } else if(Objects.equals(productName, EWAY_BILL.name())) {
+            conditions.add(new KeyValue("gstinId", gstinId));
             subIdList = dao.executeSqlQuery(DBQueries.GET_EWB_SUBSCRIPTION_ID, conditions);
-        } else if(!Objects.equals(productName, GSTR.name()) &&
-                !Objects.equals(productName, EWAY_BILL.name())) {
+            conditions.clear();
+        } else {
+            conditions.add(new KeyValue("gstinId", gstinId));
+            conditions.add(new KeyValue("productName", productName));
             subIdList = dao.executeSqlQuery(DBQueries.GET_PRODUCT_SUBSCRIPTION_ID, conditions);
         }
 
         Object subId = subIdList.get(0);
-        if(subId == null || subIdList.isEmpty()) {
+        if(subId == null) {
             throw new GSPException(ErrorCode.SUBSCRIPTION_ID_NOT_FOUND + gstin);
         }
         result = subId.toString();
