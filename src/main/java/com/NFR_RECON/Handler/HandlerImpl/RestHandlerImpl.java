@@ -4,6 +4,7 @@ import com.NFR_RECON.Constants.Enum.ReturnTypes;
 import com.NFR_RECON.Constants.ResponseMessage;
 import com.NFR_RECON.DTO.AddonDateExtensionRequest;
 import com.NFR_RECON.DTO.ReturnPeriodResponse;
+import com.NFR_RECON.DTO.SubscriptionRequest;
 import com.NFR_RECON.Exception.GSPException;
 import com.NFR_RECON.Handler.IRestHandler;
 import com.NFR_RECON.Handler.ResponseHandler;
@@ -11,6 +12,7 @@ import com.NFR_RECON.Service.Einvoice.IRestService;
 import com.NFR_RECON.Service.Invoices.SaveInvoicesService;
 import com.NFR_RECON.Service.Addon.IUpdateAddonService;
 import com.NFR_RECON.Service.Recon.UpdateReconStatusService;
+import com.NFR_RECON.Service.Subscription.DeleteSubscriptionService;
 import com.NFR_RECON.Util.GeneralUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,9 @@ public class RestHandlerImpl implements IRestHandler {
 
     @Autowired
     private IUpdateAddonService updateAddonService;
+
+    @Autowired
+    private DeleteSubscriptionService deleteSubscriptionService;
 
     @Autowired
     private UpdateReconStatusService updateReconStatusService;
@@ -238,6 +243,25 @@ public class RestHandlerImpl implements IRestHandler {
                 + gstinNumber + " and gstinId: " + gstinId);
 
         return result;
+    }
+
+    // ----- Subscription-cleanUp API -----
+    @Override
+    public ResponseEntity<Map<String, Object>> deleteSubcription(SubscriptionRequest request) throws GSPException {
+        LOGGER.log(Level.INFO, "START >> CLASS : RestHandlerImpl >> METHOD : deleteSubcription >> gstin: " +
+                request.getGstin());
+        ResponseEntity<Map<String, Object>> result;
+
+        String gstin = request.getGstin();
+
+        // get gstinId from gstinNumber
+        Long gstinId = deleteSubscriptionService.getGstinId(gstin);
+        String product = request.getProductName();
+
+        deleteSubscriptionService.getTableName(gstinId, product);
+        LOGGER.log(Level.INFO, "END >> CLASS : RestHandlerImpl >> METHOD : deleteSubcription >> gstin: " +
+                request.getGstin());
+        return null;
     }
 
 }

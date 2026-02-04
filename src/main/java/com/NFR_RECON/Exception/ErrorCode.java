@@ -19,6 +19,7 @@ public enum ErrorCode {
     UPDATE_FAILURE("UFE", "Failed to update Reconcilation Status", HttpStatus.INTERNAL_SERVER_ERROR),
     GSTIN_ID_NOT_FOUND("GINF", "No Gstin ID found with Gstin number: ", HttpStatus.NOT_FOUND),
     SUBSCRIPTION_ID_NOT_FOUND("SNF", "Subscription ID Not found with gstin number: ", HttpStatus.NOT_FOUND),
+    DELETE_FAILURE("UFE", "Failed to delete the subscription", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
     private final String code;

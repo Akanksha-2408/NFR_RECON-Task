@@ -17,4 +17,8 @@ public class DBQueries {
     public static final QueryBean GET_GSTR2B_LATEST_MMRECON_DETAILS = new QueryBean("Select gstr2b_from_rtnprd, gstr2b_to_rtnprd FROM " + DbTables.TBL_LATEST_GSTR2B_MULTIMONTH_RECON_DETAILS + " WHERE gstin = :gstin" );
     public static final String UPDATE_RECON_STATUS = "UPDATE " + DbTables.TBL_TRANSACTION_MANAGER + " SET status = :newStatus WHERE GSTIN_ID = :gstinId AND RETURN_TYPE = :returnType AND STATUS = :oldStatus AND RETURN_PERIOD IN :RetPrd";
 
+    public static final QueryBean GET_GSTR_PAYMENT_STATUS_BY_GSTIN = new QueryBean("SELECT PAYMENT_STATUS from " + DbTables.TBL_SUBSCRIPTION_DETAILS + " where gstin_id = :gstinId");
+    public static final QueryBean GET_EWB_PAYMENT_STATUS_BY_GSTIN = new QueryBean("SELECT PAYMENT_STATUS from " + DbTables.TBL_EWB_SUBSCRIPTION_DETAILS + " where gstin_id = :gstinId");
+    public static final QueryBean GET_EINVOICE_PAYMENT_STATUS_BY_GSTIN = new QueryBean("SELECT PAYMENT_STATUS from einv_subscription_details where GSTIN_ID = :gstinId");
+
 }
