@@ -246,22 +246,44 @@ public class RestHandlerImpl implements IRestHandler {
     }
 
     // ----- Subscription-cleanUp API -----
+
     @Override
     public ResponseEntity<Map<String, Object>> deleteSubcription(SubscriptionRequest request) throws GSPException {
+
         LOGGER.log(Level.INFO, "START >> CLASS : RestHandlerImpl >> METHOD : deleteSubcription >> gstin: " +
                 request.getGstin());
-        ResponseEntity<Map<String, Object>> result;
 
-        String gstin = request.getGstin();
+        ResponseEntity<Map<String, Object>> result = null;
 
-        // get gstinId from gstinNumber
-        Long gstinId = deleteSubscriptionService.getGstinId(gstin);
+        String gstinNumber = request.getGstin();
         String product = request.getProductName();
+        String subsId = request.getSubscriptionId();
 
-        deleteSubscriptionService.getTableName(gstinId, product);
+        // ----- Get GstinId from GstinNumber -----
+        Long gstinId = deleteSubscriptionService.getGstinId(gstinNumber);
+
+        // ----- Get Payment Status and check if it is 'GROUP_SUBSCRIPTION' -----
+        boolean status = deleteSubscriptionService.checkPaymentStatus(gstinId, product);
+
+        // ----- Delete data -----
+        if(status) {
+            String deletedRecords = deleteSubscriptionService.deleteRecords(gstinId, subsId, product);
+            if(deletedRecords == null) {
+                LOGGER.log(Level.INFO, "INTERMEDIATE >> CLASS: RestHandlerImpl >> METHOD: deleteSubcription >> " +
+                        ResponseMessage.DELETE_SUCCESSFUL);
+            } else {
+                LOGGER.log(Level.INFO, "INTERMEDIATE >> CLASS: RestHandlerImpl >> METHOD: deleteSubcription >> " +
+                        deletedRecords);
+            }
+            result = new ResponseEntity<>(ResponseHandler.error(ResponseMessage.DELETE_SUCCESSFUL), HttpStatus.OK);
+        } else {
+            result = new ResponseEntity<>(ResponseHandler.error(ResponseMessage.NO_RECORDS),
+                    HttpStatus.NOT_FOUND);
+        }
+
         LOGGER.log(Level.INFO, "END >> CLASS : RestHandlerImpl >> METHOD : deleteSubcription >> gstin: " +
                 request.getGstin());
-        return null;
+        return result;
     }
 
 }

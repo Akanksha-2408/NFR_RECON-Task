@@ -20,6 +20,10 @@ public enum ErrorCode {
     GSTIN_ID_NOT_FOUND("GINF", "No Gstin ID found with Gstin number: ", HttpStatus.NOT_FOUND),
     SUBSCRIPTION_ID_NOT_FOUND("SNF", "Subscription ID Not found with gstin number: ", HttpStatus.NOT_FOUND),
     DELETE_FAILURE("UFE", "Failed to delete the subscription", HttpStatus.INTERNAL_SERVER_ERROR),
+    FAILED_TO_DELETE_DATA_FROM_SUBSCRIPTION_DETAILS("FDSD", "Failed to delete record from SubscriptionDetails table where gsinId: ", HttpStatus.CONFLICT),
+    FAILED_TO_DELETE_DATA_FROM_EWB_SUBSCRIPTION_DETAILS("FDWSD", "Failed to delete record from EwbSubscriptionDetails table where gsinId: ", HttpStatus.CONFLICT),
+    FAILED_TO_DELETE_DATA_FROM_EINV_SUBSCRIPTION_DETAILS("FDESD", "Failed to delete record from EinvSubscriptionDetails table where gsinId: ", HttpStatus.CONFLICT),
+    FAILED_TO_DELETE_DATA_FROM_GROUP_SUBSCRIPTION_MAPPING("FDGSM", "Failed to delete record from GroupSubcriptionMapping table where gsinId: ", HttpStatus.CONFLICT),
     ;
 
     private final String code;

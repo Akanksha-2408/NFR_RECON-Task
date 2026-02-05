@@ -17,8 +17,13 @@ public class DBQueries {
     public static final QueryBean GET_GSTR2B_LATEST_MMRECON_DETAILS = new QueryBean("Select gstr2b_from_rtnprd, gstr2b_to_rtnprd FROM " + DbTables.TBL_LATEST_GSTR2B_MULTIMONTH_RECON_DETAILS + " WHERE gstin = :gstin" );
     public static final String UPDATE_RECON_STATUS = "UPDATE " + DbTables.TBL_TRANSACTION_MANAGER + " SET status = :newStatus WHERE GSTIN_ID = :gstinId AND RETURN_TYPE = :returnType AND STATUS = :oldStatus AND RETURN_PERIOD IN :RetPrd";
 
-    public static final QueryBean GET_GSTR_PAYMENT_STATUS_BY_GSTIN = new QueryBean("SELECT PAYMENT_STATUS from " + DbTables.TBL_SUBSCRIPTION_DETAILS + " where gstin_id = :gstinId");
-    public static final QueryBean GET_EWB_PAYMENT_STATUS_BY_GSTIN = new QueryBean("SELECT PAYMENT_STATUS from " + DbTables.TBL_EWB_SUBSCRIPTION_DETAILS + " where gstin_id = :gstinId");
-    public static final QueryBean GET_EINVOICE_PAYMENT_STATUS_BY_GSTIN = new QueryBean("SELECT PAYMENT_STATUS from einv_subscription_details where GSTIN_ID = :gstinId");
+    public static final QueryBean GET_GSTR_PAYMENT_STATUS_BY_GSTIN_ID = new QueryBean("SELECT PAYMENT_STATUS from " + DbTables.TBL_SUBSCRIPTION_DETAILS + " where gstin_id = :gstinId");
+    public static final QueryBean GET_EWAY_BILL_PAYMENT_STATUS_BY_GSTIN_ID = new QueryBean("SELECT PAYMENT_STATUS from " + DbTables.TBL_EWB_SUBSCRIPTION_DETAILS + " where gstin_id = :gstinId");
+    public static final QueryBean GET_E_INVOICE_PAYMENT_STATUS_BY_GSTIN_ID = new QueryBean("SELECT PAYMENT_STATUS from einv_subscription_details where GSTIN_ID = :gstinId");
+
+    public static final String DELETE_FROM_SUBSCRIPTION_DETAILS_BY_GSTIN_ID_AND_SUBS_ID = "DELETE from " + DbTables.TBL_SUBSCRIPTION_DETAILS + " where GSTIN_ID = :gstinId AND SUBSCRIPTION_ID = :subsId";
+    public static final String DELETE_FROM_EWB_SUBSCRIPTION_DETAILS_BY_GSTIN_ID_AND_SUBS_ID = "DELETE from " + DbTables.TBL_EWB_SUBSCRIPTION_DETAILS + " where GSTIN_ID = :gstinId AND SUBSCRIPTION_ID = :subsId";
+    public static final String DELETE_FROM_EINV_SUBSCRIPTION_DETAILS_BY_GSTIN_ID_AND_SUBS_ID = "DELETE from einv_subscription_details where GSTIN_ID = :gstinId AND SUBSCRIPTION_ID = :subsId";
+    public static final String DELETE_FROM_GROUP_SUBSCRIPTION_MAPPING_BY_GSTIN_ID_AND_SUBS_ID_AND_PRODUCT_NAME = "Delete from " + DbTables.TBL_GROUP_SUBSCRIPTION_MAPPING + " where PRIMARY_GSTIN_ID = :gstinId AND SUBSCRIPTION_ID = :subsId AND PRODUCT_NAME = :product";
 
 }

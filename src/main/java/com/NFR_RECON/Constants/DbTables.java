@@ -17,5 +17,8 @@ public interface DbTables {
     String TBL_TRANSACTION_MANAGER = "transaction_manager";
     String TBL_LATEST_GSTR2B_MULTIMONTH_RECON_DETAILS = "gstr2b_latest_mmrecon_details";
     String TBL_USER = "user";
+    String TBL_GROUP_SUBSCRIPTION_MAPPING = "group_subscription_mapping";
+    String TBL_ANNUAL_RECORD_COUNT_DETAILS =  "annual_record_count_details";
+    String TBL_EINV_SUBSCRIPTION_DETAILS = "einv_subscription_details";
 
 }
